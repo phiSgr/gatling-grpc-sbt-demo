@@ -1,14 +1,15 @@
 enablePlugins(GatlingPlugin)
 
-scalaVersion := "2.12.12"
+scalaVersion := "2.13.4"
 
 scalacOptions := Seq(
   "-encoding", "UTF-8", "-target:jvm-1.8", "-deprecation",
   "-feature", "-unchecked", "-language:implicitConversions", "-language:postfixOps")
 
-libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.4.1" % "test,it"
-libraryDependencies += "io.gatling"            % "gatling-test-framework"    % "3.4.1" % "test,it"
-libraryDependencies += "com.github.phisgr" %% "gatling-grpc" % "0.10.1" % "test,it"
+val gatlingVersion = "3.5.0"
+libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % gatlingVersion % "test,it"
+libraryDependencies += "io.gatling"            % "gatling-test-framework"    % gatlingVersion % "test,it"
+libraryDependencies += "com.github.phisgr" %% "gatling-grpc" % "0.11.0" % "test,it"
 
 PB.targets in Compile := Seq(
   scalapb.gen() -> (sourceManaged in Compile).value
@@ -21,16 +22,16 @@ libraryDependencies ++= Seq(
 )
 
 Project.inConfig(IntegrationTest)(baseAssemblySettings)
-// You fat JAR will be in target/scala-2.12/grpc-test-bundle.jar
+// You fat JAR will be in target/scala-2.13/grpc-test-bundle.jar
 assemblyJarName in IntegrationTest := s"grpc-test-bundle.jar"
 // Exclude libraries that are already present in the Gatling bundle
 assemblyExcludedJars in assembly in IntegrationTest := {
-  val gatlingHome = file(sys.props("user.home")) / "Downloads" / "gatling-charts-highcharts-bundle-3.4.1"
+  val gatlingHome = file(sys.props("user.home")) / "Downloads" / "gatling-charts-highcharts-bundle-3.5.0"
   val libFiles = Option((gatlingHome / "lib").list).getOrElse {
     throw new IllegalStateException(s"Gatling lib not found in $gatlingHome")
   }
 
-  val gatlingLibs = Set("gatling-test-framework-3.4.1.jar") ++ libFiles
+  val gatlingLibs = Set("gatling-test-framework-3.5.0.jar") ++ libFiles
 
   (fullClasspath in IntegrationTest).value.filter { classPath =>
     gatlingLibs.contains(classPath.data.getName)
